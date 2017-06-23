@@ -8,6 +8,7 @@
 #==============================================
 import sys
 import json
+import pandas as pd
 #==============================================
 #                   Files
 #==============================================
@@ -24,7 +25,7 @@ def json_to_pandas(json_name, verbose=1):
     with open(json_name, 'r') as iOF:
         json_dict = json.loads(iOF.read())
 
-    return json_dict
+    return pd.DataFrame(json_dict["annotations"])
 
 #==============================================
 #                   Main
@@ -32,4 +33,5 @@ def json_to_pandas(json_name, verbose=1):
 if __name__ == '__main__':
     json_name = str(sys.argv[1])
     df = json_to_pandas(json_name)
-    print(df)
+    csv_name = '.'.join(json_name.split('.')[:-1])+'.csv'
+    df.to_csv(csv_name, index=False, header=True)
