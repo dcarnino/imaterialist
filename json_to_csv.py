@@ -32,4 +32,4 @@ def json_to_pandas(json_name, verbose=1):
 if __name__ == '__main__':
     json_name = str(sys.argv[1])
     df = json_to_pandas(json_name)
-    print df
+    print(df)
