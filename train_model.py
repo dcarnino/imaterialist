@@ -69,7 +69,7 @@ def instantiate(n_classes, n_dense=2048, inception_json="inceptionv3_mod.json", 
 
 
 def finetune(base_model, model, X_train, y_train, X_val, y_val,
-             epochs_1=15, epochs_2=30, patience_1=1, patience_2=1, batch_size=32,
+             epochs_1=1000, epochs_2=2000, patience_1=1, patience_2=1, batch_size=32,
              nb_train_samples=41000, nb_validation_samples=7611,
              img_width=299, img_height=299, class_imbalance=False,
              inception_h5_1="inceptionv3_fine_tuned_1.h5", inception_h5_2="inceptionv3_fine_tuned_2.h5",
@@ -170,7 +170,7 @@ def finetune(base_model, model, X_train, y_train, X_val, y_val,
 
 def finetune_from_saved(inception_h5_load_from, inception_h5_save_to,
              inception_json, X_train, y_train, X_val, y_val, nb_freeze=0,
-             epochs=50, patience=2, batch_size=32,
+             epochs=5000, patience=2, batch_size=32,
              nb_train_samples=85639, nb_validation_samples=10694,
              img_width=299, img_height=299, class_imbalance=False,
              inception_h5_check_point="inceptionv3_fine_tuned_check_point_3.h5", verbose=1):
