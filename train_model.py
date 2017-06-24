@@ -316,14 +316,18 @@ def train_for_each_task(df_labels_train, df_labels_val, target_size=(299,299),
         grouped_df_val = df_labels_val[df_labels_val.taskId == tid].groupby(['imageId'])['labelId'].apply(list)
         X_train, y_train = [], []
         X_val, y_val = [], []
+        i1, i2, i3 = 0, 0, 0
         # for train and validation
         for gdf, X, y, img_dir in [(grouped_df_train, X_train, y_train, train_dir), (grouped_df_val, X_val, y_val, validation_dir)]:
             for image_id in gdf.index:
+                i1 =+ 1
                 image_path = img_dir+str(image_id)+".jpg"
                 if os.path.exists(image_path):
+                    i2 =+ 1
                     try:
                         # get X
                         img = load_img(image_path, target_size=target_size)
+                        i3 =+ 1
                         arr = img_to_array(img)
                         X.append(arr)
                         # get y
@@ -332,12 +336,13 @@ def train_for_each_task(df_labels_train, df_labels_val, target_size=(299,299),
                         y_lab[y_pos] = 1
                         y.append(y_lab)
                     except OSError:
-                        print("OSError on image %s."%image_path)
+                        if verbose >= 2: print("OSError on image %s."%image_path)
         X_train = np.array(X_train)
         y_train = np.array(y_train)
         X_val = np.array(X_val)
         y_val = np.array(y_val)
         print(X_train.shape, y_train.shape, X_val.shape, y_val.shape)
+        print(i1, i2, i3)
 
         ### Train model
         if verbose >= 1: print("\tFine-tuning Inception V3 first two passes...")
