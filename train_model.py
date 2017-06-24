@@ -48,7 +48,7 @@ def instantiate(n_classes, n_dense=2048, inception_json="inceptionv3_mod.json", 
     predictions = Dense(n_classes, activation='softmax')(x)
 
     # this is the model we will train
-    model = Model(input=base_model.input, output=predictions)
+    model = Model(inputs=base_model.input, outputs=predictions)
 
     # first: train only the top layers (which were randomly initialized)
     # i.e. freeze all convolutional InceptionV3 layers
@@ -321,15 +321,18 @@ def train_for_each_task(df_labels_train, df_labels_val, target_size=(299,299),
             for image_id in gdf.index:
                 image_path = img_dir+str(image_id)+".jpg"
                 if os.path.exists(image_path):
-                    # get X
-                    img = load_img(image_path, target_size=target_size)
-                    arr = img_to_array(img)
-                    X.append(arr)
-                    # get y
-                    y_pos = le.transform(gdf[image_id])
-                    y_lab = np.zeros((n_classes,), dtype=int)
-                    y_lab[y_pos] = 1
-                    y.append(y_lab)
+                    try:
+                        # get X
+                        img = load_img(image_path, target_size=target_size)
+                        arr = img_to_array(img)
+                        X.append(arr)
+                        # get y
+                        y_pos = le.transform(gdf[image_id])
+                        y_lab = np.zeros((n_classes,), dtype=int)
+                        y_lab[y_pos] = 1
+                        y.append(y_lab)
+                    except OSError:
+                        print("OSError on image %s."%image_path)
         X_train = np.array(X_train)
         y_train = np.array(y_train)
         X_val = np.array(X_val)
