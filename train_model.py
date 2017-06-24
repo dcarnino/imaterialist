@@ -330,6 +330,7 @@ def train_for_each_task(df_labels_train, df_labels_val, target_size=(299,299),
                         i3 += 1
                         arr = img_to_array(img)
                         X.append(arr)
+                        print(len(X),i3)
                         # get y
                         y_pos = le.transform(gdf[image_id])
                         y_lab = np.zeros((n_classes,), dtype=int)
