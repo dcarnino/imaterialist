@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 import time
 import gzip
-import cPickle as pickle
+import pickle
 from collections import Counter
 from keras.applications.inception_v3 import InceptionV3
 from keras.preprocessing.image import ImageDataGenerator, load_img, img_to_array
