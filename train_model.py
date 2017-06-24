@@ -102,7 +102,7 @@ def finetune(base_model, model, X_train, y_train, X_val, y_val,
         X_val,
         y_val,
         batch_size=batch_size,
-        shuffle=False)
+        shuffle=True)
 
     # get class weights
     if class_imbalance:
@@ -219,7 +219,7 @@ def finetune_from_saved(inception_h5_load_from, inception_h5_save_to,
         X_val,
         y_val,
         batch_size=batch_size,
-        shuffle=False)
+        shuffle=True)
 
     # get class weights
     if class_imbalance:
@@ -316,21 +316,16 @@ def train_for_each_task(df_labels_train, df_labels_val, target_size=(299,299),
         grouped_df_val = df_labels_val[df_labels_val.taskId == tid].groupby(['imageId'])['labelId'].apply(list)
         X_train, y_train = [], []
         X_val, y_val = [], []
-        i1, i2, i3 = 0, 0, 0
         # for train and validation
         for gdf, X, y, img_dir in [(grouped_df_train, X_train, y_train, train_dir), (grouped_df_val, X_val, y_val, validation_dir)]:
             for image_id in gdf.index:
-                i1 += 1
                 image_path = img_dir+str(image_id)+".jpg"
                 if os.path.exists(image_path):
-                    i2 += 1
                     try:
                         # get X
                         img = load_img(image_path, target_size=target_size)
-                        i3 += 1
                         arr = img_to_array(img)
                         X.append(arr)
-                        print(len(X),i3)
                         # get y
                         y_pos = le.transform(gdf[image_id])
                         y_lab = np.zeros((n_classes,), dtype=int)
@@ -342,13 +337,12 @@ def train_for_each_task(df_labels_train, df_labels_val, target_size=(299,299),
         y_train = np.array(y_train)
         X_val = np.array(X_val)
         y_val = np.array(y_val)
-        print(X_train.shape, y_train.shape, X_val.shape, y_val.shape)
-        print(i1, i2, i3)
 
         ### Train model
         if verbose >= 1: print("\tFine-tuning Inception V3 first two passes...")
         finetune(base_model, model, X_train, y_train, X_val, y_val, batch_size=48,
                  nb_train_samples=len(y_train), nb_validation_samples=len(y_val),
+                 patience_1=5, patience_2=5,
                  inception_h5_1=model_dir+"inceptionv3_fine_tuned_1_%d.h5"%tid,
                  inception_h5_2=model_dir+"inceptionv3_fine_tuned_2_%d.h5"%tid,
                  inception_h5_check_point_1=model_dir+"inceptionv3_fine_tuned_check_point_1_%d.h5"%tid,
@@ -360,6 +354,7 @@ def train_for_each_task(df_labels_train, df_labels_val, target_size=(299,299),
                             model_dir+"inceptionv3_fine_tuned_3_%d.h5"%tid,
                             model_dir+"inceptionv3_mod_%d.json"%tid,
                             X_train, y_train, X_val, y_val, batch_size=48,
+                            patience=10,
                             nb_train_samples=len(y_train), nb_validation_samples=len(y_val),
                             inception_h5_check_point=model_dir+"inceptionv3_fine_tuned_check_point_3_%d.h5"%tid,
                             verbose=verbose)
