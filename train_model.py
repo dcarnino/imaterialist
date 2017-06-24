@@ -337,6 +337,7 @@ def train_for_each_task(df_labels_train, df_labels_val, target_size=(299,299),
         y_train = np.array(y_train)
         X_val = np.array(X_val)
         y_val = np.array(y_val)
+        print(X_train.shape, y_train.shape, X_val.shape, y_val.shape)
 
         ### Train model
         if verbose >= 1: print("\tFine-tuning Inception V3 first two passes...")
