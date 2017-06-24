@@ -349,7 +349,7 @@ def train_for_each_task(df_labels_train, df_labels_val, target_size=(299,299),
                  inception_h5_check_point_2=model_dir+"inceptionv3_fine_tuned_check_point_2_%d.h5"%tid,
                  layer_names_file=model_dir+"inceptionv3_mod_layer_names.txt",
                  verbose=verbose)
-        if verbose >= 1: print("\tFine-tuning Inception V3 third pass (task %d)..."%tid")
+        if verbose >= 1: print("\tFine-tuning Inception V3 third pass (task %d)..."%tid)
         finetune_from_saved(model_dir+"inceptionv3_fine_tuned_check_point_2_%d.h5"%tid,
                             model_dir+"inceptionv3_fine_tuned_3_%d.h5"%tid,
                             model_dir+"inceptionv3_mod_%d.json"%tid,
