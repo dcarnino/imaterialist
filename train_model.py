@@ -307,11 +307,11 @@ def train_for_each_task(df_labels_train, df_labels_val, target_size=(299,299),
             pickle.dump(le, iOF)
 
         ### Create model
-        if verbose >= 1: print("\tInstantiating Inception V3...")
+        if verbose >= 1: print("\tInstantiating Inception V3 (task %d)..."%tid)
         base_model, model = instantiate(n_classes, inception_json=model_dir+"inceptionv3_mod_%d.json"%tid, verbose=verbose)
 
         ### Load images
-        if verbose >= 1: print("\tLoading images into RAM...")
+        if verbose >= 1: print("\tLoading images into RAM (task %d)..."%tid)
         grouped_df_train = df_task_train.groupby(['imageId'])['labelId'].apply(list)
         grouped_df_val = df_labels_val[df_labels_val.taskId == tid].groupby(['imageId'])['labelId'].apply(list)
         X_train, y_train = [], []
@@ -339,7 +339,7 @@ def train_for_each_task(df_labels_train, df_labels_val, target_size=(299,299),
         y_val = np.array(y_val)
 
         ### Train model
-        if verbose >= 1: print("\tFine-tuning Inception V3 first two passes...")
+        if verbose >= 1: print("\tFine-tuning Inception V3 first two passes (task %d)..."%tid)
         finetune(base_model, model, X_train, y_train, X_val, y_val, batch_size=56,
                  nb_train_samples=len(y_train), nb_validation_samples=len(y_val),
                  patience_1=2, patience_2=4,
@@ -349,7 +349,7 @@ def train_for_each_task(df_labels_train, df_labels_val, target_size=(299,299),
                  inception_h5_check_point_2=model_dir+"inceptionv3_fine_tuned_check_point_2_%d.h5"%tid,
                  layer_names_file=model_dir+"inceptionv3_mod_layer_names.txt",
                  verbose=verbose)
-        if verbose >= 1: print("\tFine-tuning Inception V3 third pass...")
+        if verbose >= 1: print("\tFine-tuning Inception V3 third pass (task %d)..."%tid")
         finetune_from_saved(model_dir+"inceptionv3_fine_tuned_check_point_2_%d.h5"%tid,
                             model_dir+"inceptionv3_fine_tuned_3_%d.h5"%tid,
                             model_dir+"inceptionv3_mod_%d.json"%tid,
