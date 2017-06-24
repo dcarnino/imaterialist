@@ -320,14 +320,14 @@ def train_for_each_task(df_labels_train, df_labels_val, target_size=(299,299),
         # for train and validation
         for gdf, X, y, img_dir in [(grouped_df_train, X_train, y_train, train_dir), (grouped_df_val, X_val, y_val, validation_dir)]:
             for image_id in gdf.index:
-                i1 =+ 1
+                i1 += 1
                 image_path = img_dir+str(image_id)+".jpg"
                 if os.path.exists(image_path):
-                    i2 =+ 1
+                    i2 += 1
                     try:
                         # get X
                         img = load_img(image_path, target_size=target_size)
-                        i3 =+ 1
+                        i3 += 1
                         arr = img_to_array(img)
                         X.append(arr)
                         # get y
