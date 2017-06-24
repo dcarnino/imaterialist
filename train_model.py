@@ -279,7 +279,7 @@ def get_class_weights(y, smooth_factor=0):
 
 
 def train_for_each_task(df_labels_train, df_labels_val, target_size=(299,299),
-                        model_dir="../data/imaterialist/models/"
+                        model_dir="../data/imaterialist/models/",
                         train_dir="../data/imaterialist/train_images/",
                         validation_dir="../data/imaterialist/validation_images/",
                         verbose=1):
