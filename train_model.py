@@ -293,71 +293,73 @@ def train_for_each_task(df_labels_train, df_labels_val, target_size=(299,299),
     ### loop over tasks
     for tid in different_tasks:
 
-        if verbose >= 1: print("Training for task %d..."%tid)
+        if tid > 10:
 
-        ### Get number of classes
-        df_task_train = df_labels_train[df_labels_train.taskId == tid]
-        le = LabelEncoder()
-        le.fit(df_task_train.labelId)
-        different_classes = le.classes_
-        n_classes = len(different_classes)
+            if verbose >= 1: print("Training for task %d..."%tid)
 
-        ### Store LabelEncoder
-        with gzip.open(model_dir+'label_encoder_%d.pkl'%tid, 'wb') as iOF:
-            pickle.dump(le, iOF)
+            ### Get number of classes
+            df_task_train = df_labels_train[df_labels_train.taskId == tid]
+            le = LabelEncoder()
+            le.fit(df_task_train.labelId)
+            different_classes = le.classes_
+            n_classes = len(different_classes)
 
-        ### Create model
-        if verbose >= 1: print("\tInstantiating Inception V3 (task %d)..."%tid)
-        base_model, model = instantiate(n_classes, inception_json=model_dir+"inceptionv3_mod_%d.json"%tid, verbose=verbose)
+            ### Store LabelEncoder
+            with gzip.open(model_dir+'label_encoder_%d.pkl'%tid, 'wb') as iOF:
+                pickle.dump(le, iOF)
 
-        ### Load images
-        if verbose >= 1: print("\tLoading images into RAM (task %d)..."%tid)
-        grouped_df_train = df_task_train.groupby(['imageId'])['labelId'].apply(list)
-        grouped_df_val = df_labels_val[df_labels_val.taskId == tid].groupby(['imageId'])['labelId'].apply(list)
-        X_train, y_train = [], []
-        X_val, y_val = [], []
-        # for train and validation
-        for gdf, X, y, img_dir in [(grouped_df_train, X_train, y_train, train_dir), (grouped_df_val, X_val, y_val, validation_dir)]:
-            for image_id in gdf.index:
-                image_path = img_dir+str(image_id)+".jpg"
-                if os.path.exists(image_path):
-                    try:
-                        # get X
-                        img = load_img(image_path, target_size=target_size)
-                        arr = img_to_array(img)
-                        X.append(arr)
-                        # get y
-                        y_pos = le.transform(gdf[image_id])
-                        y_lab = np.zeros((n_classes,), dtype=int)
-                        y_lab[y_pos] = 1
-                        y.append(y_lab)
-                    except OSError:
-                        if verbose >= 2: print("OSError on image %s."%image_path)
-        X_train = np.array(X_train)
-        y_train = np.array(y_train)
-        X_val = np.array(X_val)
-        y_val = np.array(y_val)
+            ### Create model
+            if verbose >= 1: print("\tInstantiating Inception V3 (task %d)..."%tid)
+            base_model, model = instantiate(n_classes, inception_json=model_dir+"inceptionv3_mod_%d.json"%tid, verbose=verbose)
 
-        ### Train model
-        if verbose >= 1: print("\tFine-tuning Inception V3 first two passes (task %d)..."%tid)
-        finetune(base_model, model, X_train, y_train, X_val, y_val, batch_size=56,
-                 nb_train_samples=len(y_train), nb_validation_samples=len(y_val),
-                 patience_1=2, patience_2=4,
-                 inception_h5_1=model_dir+"inceptionv3_fine_tuned_1_%d.h5"%tid,
-                 inception_h5_2=model_dir+"inceptionv3_fine_tuned_2_%d.h5"%tid,
-                 inception_h5_check_point_1=model_dir+"inceptionv3_fine_tuned_check_point_1_%d.h5"%tid,
-                 inception_h5_check_point_2=model_dir+"inceptionv3_fine_tuned_check_point_2_%d.h5"%tid,
-                 layer_names_file=model_dir+"inceptionv3_mod_layer_names.txt",
-                 verbose=verbose)
-        if verbose >= 1: print("\tFine-tuning Inception V3 third pass (task %d)..."%tid)
-        finetune_from_saved(model_dir+"inceptionv3_fine_tuned_check_point_2_%d.h5"%tid,
-                            model_dir+"inceptionv3_fine_tuned_3_%d.h5"%tid,
-                            model_dir+"inceptionv3_mod_%d.json"%tid,
-                            X_train, y_train, X_val, y_val, batch_size=56,
-                            patience=8,
-                            nb_train_samples=len(y_train), nb_validation_samples=len(y_val),
-                            inception_h5_check_point=model_dir+"inceptionv3_fine_tuned_check_point_3_%d.h5"%tid,
-                            verbose=verbose)
+            ### Load images
+            if verbose >= 1: print("\tLoading images into RAM (task %d)..."%tid)
+            grouped_df_train = df_task_train.groupby(['imageId'])['labelId'].apply(list)
+            grouped_df_val = df_labels_val[df_labels_val.taskId == tid].groupby(['imageId'])['labelId'].apply(list)
+            X_train, y_train = [], []
+            X_val, y_val = [], []
+            # for train and validation
+            for gdf, X, y, img_dir in [(grouped_df_train, X_train, y_train, train_dir), (grouped_df_val, X_val, y_val, validation_dir)]:
+                for image_id in gdf.index:
+                    image_path = img_dir+str(image_id)+".jpg"
+                    if os.path.exists(image_path):
+                        try:
+                            # get X
+                            img = load_img(image_path, target_size=target_size)
+                            arr = img_to_array(img)
+                            X.append(arr)
+                            # get y
+                            y_pos = le.transform(gdf[image_id])
+                            y_lab = np.zeros((n_classes,), dtype=int)
+                            y_lab[y_pos] = 1
+                            y.append(y_lab)
+                        except OSError:
+                            if verbose >= 2: print("OSError on image %s."%image_path)
+            X_train = np.array(X_train)
+            y_train = np.array(y_train)
+            X_val = np.array(X_val)
+            y_val = np.array(y_val)
+
+            ### Train model
+            if verbose >= 1: print("\tFine-tuning Inception V3 first two passes (task %d)..."%tid)
+            finetune(base_model, model, X_train, y_train, X_val, y_val, batch_size=56,
+                     nb_train_samples=len(y_train), nb_validation_samples=len(y_val),
+                     patience_1=2, patience_2=4,
+                     inception_h5_1=model_dir+"inceptionv3_fine_tuned_1_%d.h5"%tid,
+                     inception_h5_2=model_dir+"inceptionv3_fine_tuned_2_%d.h5"%tid,
+                     inception_h5_check_point_1=model_dir+"inceptionv3_fine_tuned_check_point_1_%d.h5"%tid,
+                     inception_h5_check_point_2=model_dir+"inceptionv3_fine_tuned_check_point_2_%d.h5"%tid,
+                     layer_names_file=model_dir+"inceptionv3_mod_layer_names.txt",
+                     verbose=verbose)
+            if verbose >= 1: print("\tFine-tuning Inception V3 third pass (task %d)..."%tid)
+            finetune_from_saved(model_dir+"inceptionv3_fine_tuned_check_point_2_%d.h5"%tid,
+                                model_dir+"inceptionv3_fine_tuned_3_%d.h5"%tid,
+                                model_dir+"inceptionv3_mod_%d.json"%tid,
+                                X_train, y_train, X_val, y_val, batch_size=56,
+                                patience=8,
+                                nb_train_samples=len(y_train), nb_validation_samples=len(y_val),
+                                inception_h5_check_point=model_dir+"inceptionv3_fine_tuned_check_point_3_%d.h5"%tid,
+                                verbose=verbose)
 
 
 
