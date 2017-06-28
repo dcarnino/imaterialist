@@ -294,7 +294,7 @@ def train_for_each_task(df_labels_train, df_labels_val, target_size=(299,299),
     ### loop over tasks
     for tid in different_tasks:
 
-        if tid > 10:
+        if tid > 19:
 
             if verbose >= 1: print("Training for task %d..."%tid)
 
