@@ -8,6 +8,7 @@
 #==============================================
 import sys
 import os
+os.environ["CUDA_VISIBLE_DEVICES"]="0"
 import numpy as np
 import pandas as pd
 import time
@@ -342,7 +343,7 @@ def train_for_each_task(df_labels_train, df_labels_val, target_size=(299,299),
 
             ### Train model
             if verbose >= 1: print("\tFine-tuning Inception V3 first two passes (task %d)..."%tid)
-            finetune(base_model, model, X_train, y_train, X_val, y_val, batch_size=56,
+            finetune(base_model, model, X_train, y_train, X_val, y_val, batch_size=48,
                      nb_train_samples=len(y_train), nb_validation_samples=len(y_val),
                      patience_1=1, patience_2=2,
                      inception_h5_1=model_dir+"inceptionv3_fine_tuned_1_%d.h5"%tid,
@@ -355,7 +356,7 @@ def train_for_each_task(df_labels_train, df_labels_val, target_size=(299,299),
             finetune_from_saved(model_dir+"inceptionv3_fine_tuned_check_point_2_%d.h5"%tid,
                                 model_dir+"inceptionv3_fine_tuned_3_%d.h5"%tid,
                                 model_dir+"inceptionv3_mod_%d.json"%tid,
-                                X_train, y_train, X_val, y_val, batch_size=56,
+                                X_train, y_train, X_val, y_val, batch_size=48,
                                 patience=5,
                                 nb_train_samples=len(y_train), nb_validation_samples=len(y_val),
                                 inception_h5_check_point=model_dir+"inceptionv3_fine_tuned_check_point_3_%d.h5"%tid,
