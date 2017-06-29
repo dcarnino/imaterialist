@@ -295,7 +295,7 @@ def train_for_each_task(df_labels_train, df_labels_val, target_size=(299,299),
     for tid in different_tasks:
         # for task 40 dress gender is always female
 
-        if tid > 40:
+        if tid > 41:
 
             if verbose >= 1: print("Training for task %d..."%tid)
 
@@ -341,6 +341,11 @@ def train_for_each_task(df_labels_train, df_labels_val, target_size=(299,299),
             y_train = np.array(y_train)
             X_val = np.array(X_val)
             y_val = np.array(y_val)
+
+            print(X_train.shape)
+            print(y_train.shape)
+            print(X_val.shape)
+            print(y_val.shape)
 
             ### Train model
             if verbose >= 1: print("\tFine-tuning Inception V3 first two passes (task %d)..."%tid)
