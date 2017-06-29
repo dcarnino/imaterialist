@@ -24,6 +24,7 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.applications.imagenet_utils import decode_predictions
 from keras.optimizers import SGD
 from sklearn.preprocessing import LabelEncoder
+from tqdm import tqdm
 #==============================================
 #                   Files
 #==============================================
@@ -141,7 +142,7 @@ def predict_for_each_task(df_labels_test, df_labels_train, target_size=(299,299)
             ### Load images
             if verbose >= 1: print("\tLoading images into RAM (task %d)..."%tid)
             X_test, y_test, id_test = [], [], []
-            for image_id in df_labels_test['imageId']:
+            for image_id in tqdm(df_labels_test['imageId'], miniters=100):
                 image_path = test_dir+str(image_id)+".jpg"
                 import_error = False
                 if os.path.exists(image_path):
