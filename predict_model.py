@@ -57,7 +57,7 @@ def load_model(chosen_metrics=['top_k_categorical_accuracy', 'categorical_accura
 
 
 
-def infer(model, X_test, y_test, batch_size=2, img_width=299, img_height=299, verbose=1):
+def infer(model, X_test, y_test, batch_size=32, img_width=299, img_height=299, verbose=1):
     """
     Infer with the inception v3.
     """
@@ -69,18 +69,26 @@ def infer(model, X_test, y_test, batch_size=2, img_width=299, img_height=299, ve
     # number of samples
     nb_test_samples = len(y_test)
 
+    # add fake entries to get batch size multiple
+    nb_add = batch_size - nb_test_samples%batch_size
+    y_test_add = y_test[-nb_add:, ...]
+    X_test_add = X_test[-nb_add:, ...]
+    y_test_stacked = np.vstack([y_test, y_test_add])
+    X_test_stacked = np.vstack([X_test, X_test_add])
+
     # define test data generators
     test_generator = test_datagen.flow(
-        X_test,
-        y_test,
+        X_test_stacked,
+        y_test_stacked,
         batch_size=batch_size,
         shuffle=False)
 
     y_pred = model.predict_generator(
         test_generator,
-        steps=nb_test_samples // batch_size)
+        steps=(nb_test_samples + nb_add) // batch_size)
 
     # get predictions
+    y_pred = y_pred[:-nb_add, ...]
     y_pred = np.array([np.argmax(yp) for yp in y_pred])
 
     return y_pred
