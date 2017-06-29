@@ -108,7 +108,7 @@ def predict_for_each_task(df_labels_test, df_labels_train, target_size=(299,299)
 
     ### Load images
     if verbose >= 1: print("Loading images into RAM...")
-    X_test, id_test, id_error = [], [], [], []
+    X_test, id_test, id_error = [], [], []
     for image_id in tqdm(df_labels_test['imageId'], miniters=100):
         image_path = test_dir+str(image_id)+".jpg"
         if os.path.exists(image_path):
