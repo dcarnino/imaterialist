@@ -73,7 +73,6 @@ def infer(model, X_test, y_test, batch_size=1, img_width=299, img_height=299, ve
     test_generator = test_datagen.flow(
         X_test,
         y_test,
-        target_size=(img_width, img_height),
         batch_size=batch_size,
         class_mode='categorical',
         shuffle=False)
@@ -125,6 +124,7 @@ def predict_for_each_task(df_labels_test, df_labels_train, target_size=(299,299)
         else:
             id_error.append(image_id)
     X_test = np.array(X_test)
+    print(X_test.shape)
 
     ### loop over tasks
     for tid in different_tasks:
