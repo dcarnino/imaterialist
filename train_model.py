@@ -293,7 +293,7 @@ def train_for_each_task(df_labels_train, df_labels_val, target_size=(299,299),
 
     ### loop over tasks
     for tid in different_tasks:
-        # for task 40 dress gender is always female
+        # for task 40 dress gender is always 4 (women)
         # for task 42 shooe pump type is always 232 (mary janes)
 
         if tid > 42:
