@@ -302,6 +302,7 @@ def train_for_each_task(df_labels_train, df_labels_val, target_size=(299,299),
 
             ### Get number of classes
             df_task_train = df_labels_train[df_labels_train.taskId == tid]
+            print(df_task_train.labelId)
             le = LabelEncoder()
             le.fit(df_task_train.labelId)
             different_classes = le.classes_
@@ -342,6 +343,11 @@ def train_for_each_task(df_labels_train, df_labels_val, target_size=(299,299),
             y_train = np.array(y_train)
             X_val = np.array(X_val)
             y_val = np.array(y_val)
+
+            print(X_train.shape)
+            print(y_train.shape)
+            print(X_val.shape)
+            print(y_val.shape)
 
             ### Train model
             if verbose >= 1: print("\tFine-tuning Inception V3 first two passes (task %d)..."%tid)
