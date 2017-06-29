@@ -86,7 +86,6 @@ def infer(model, X_test, y_test, batch_size=32, img_width=299, img_height=299, v
     y_pred = model.predict_generator(
         test_generator,
         steps=(nb_test_samples + nb_add) // batch_size,
-        workers=28, use_multiprocessing=True,
         verbose=1)
 
     # get predictions
