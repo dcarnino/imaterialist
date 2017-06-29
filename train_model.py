@@ -345,8 +345,8 @@ def train_for_each_task(df_labels_train, df_labels_val, target_size=(299,299),
             X_val = np.array(X_val)
             y_val = np.array(y_val)
 
-            print grouped_df_train.shape
-            print grouped_df_val.shape
+            print(grouped_df_train.shape)
+            print(grouped_df_val.shape)
             print(X_train.shape)
             print(y_train.shape)
             print(X_val.shape)
