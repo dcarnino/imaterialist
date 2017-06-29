@@ -294,7 +294,7 @@ def train_for_each_task(df_labels_train, df_labels_val, target_size=(299,299),
     ### loop over tasks
     for tid in different_tasks:
 
-        if tid > 20:
+        if tid > 30:
 
             if verbose >= 1: print("Training for task %d..."%tid)
 
@@ -363,6 +363,7 @@ def train_for_each_task(df_labels_train, df_labels_val, target_size=(299,299),
                                 nb_train_samples=len(y_train), nb_validation_samples=len(y_val),
                                 inception_h5_check_point=model_dir+"inceptionv3_fine_tuned_check_point_3_%d.h5"%tid,
                                 verbose=verbose)
+            K.clear_session()
 
 
 
