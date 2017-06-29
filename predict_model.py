@@ -106,6 +106,26 @@ def predict_for_each_task(df_labels_test, df_labels_train, target_size=(299,299)
     ### get all task ids
     different_tasks = set(df_labels_train.taskId)
 
+    ### Load images
+    if verbose >= 1: print("\tLoading images into RAM (task %d)..."%tid)
+    X_test, id_test, id_error = [], [], [], []
+    for image_id in tqdm(df_labels_test['imageId'], miniters=100):
+        image_path = test_dir+str(image_id)+".jpg"
+        if os.path.exists(image_path):
+            try:
+                # get X
+                img = load_img(image_path, target_size=target_size)
+                arr = img_to_array(img)
+                X_test.append(arr)
+                # get id
+                id_test.append(image_id)
+            except OSError:
+                id_error.append(image_id)
+                if verbose >= 2: print("OSError on image %s."%image_path)
+        else:
+            id_error.append(image_id)
+    X_test = np.array(X_test)
+
     ### loop over tasks
     for tid in different_tasks:
         # for task 40 dress gender is always 4 (women)
@@ -132,41 +152,19 @@ def predict_for_each_task(df_labels_test, df_labels_train, target_size=(299,299)
             with gzip.open(model_dir+'label_encoder_%d.pkl'%tid, 'rb') as iOF:
                 le = pickle.load(iOF)
 
+            ### Create fake y_test
+            y_test = np.zeros((X_test.shape[0], n_classes), dtype=int)
+
+            for iid in id_error:
+                pred_dict["id"].append("%d_%d"%(iid,tid))
+                pred_dict["expected"].append(most_common_label)
+
             ### Create model
             if verbose >= 1: print("\tLoading Inception V3 (task %d)..."%tid)
             model = load_model(chosen_metrics=None,
                                inception_json=model_dir+"inceptionv3_mod_%d.json"%tid,
                                inception_h5=model_dir+"inceptionv3_fine_tuned_check_point_3_%d.h5"%tid,
                                verbose=verbose)
-
-            ### Load images
-            if verbose >= 1: print("\tLoading images into RAM (task %d)..."%tid)
-            X_test, y_test, id_test = [], [], []
-            for image_id in tqdm(df_labels_test['imageId'], miniters=100):
-                image_path = test_dir+str(image_id)+".jpg"
-                import_error = False
-                if os.path.exists(image_path):
-                    try:
-                        # get X
-                        img = load_img(image_path, target_size=target_size)
-                        arr = img_to_array(img)
-                        X_test.append(arr)
-                        # get y
-                        y_lab = np.zeros((n_classes,), dtype=int)
-                        y_test.append(y_lab)
-                        # get id
-                        id_test.append(image_id)
-                    except OSError:
-                        import_error = True
-                        if verbose >= 2: print("OSError on image %s."%image_path)
-                else:
-                    import_error = True
-                # default for not loaded images
-                if import_error:
-                    pred_dict["id"].append("%d_%d"%(image_id,tid))
-                    pred_dict["expected"].append(most_common_label)
-            X_test = np.array(X_test)
-            y_test = np.array(y_test)
 
             ### Inference with model
             if verbose >= 1: print("\tInference with Inception V3 (task %d)..."%tid)
