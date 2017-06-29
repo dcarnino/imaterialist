@@ -346,6 +346,8 @@ def train_for_each_task(df_labels_train, df_labels_val, target_size=(299,299),
             print(y_train.shape)
             print(X_val.shape)
             print(y_val.shape)
+            print(y_train)
+            print(y_val)
 
             ### Train model
             if verbose >= 1: print("\tFine-tuning Inception V3 first two passes (task %d)..."%tid)
