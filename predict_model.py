@@ -44,7 +44,7 @@ def load_model(chosen_metrics=['top_k_categorical_accuracy', 'categorical_accura
     loaded_model = model_from_json(loaded_model_json)
     # load weights into new model
     loaded_model.load_weights(inception_h5)
-    if verbose >= 1: print "Loaded model from disk"
+    if verbose >= 1: print("Loaded model from disk")
 
     # evaluate loaded model on test data
     loaded_model.compile(loss='categorical_crossentropy', optimizer='rmsprop',
