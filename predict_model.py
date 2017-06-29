@@ -57,7 +57,7 @@ def load_model(chosen_metrics=['top_k_categorical_accuracy', 'categorical_accura
 
 
 
-def infer(model, X_test, y_test, batch_size=1, img_width=299, img_height=299, verbose=1):
+def infer(model, X_test, y_test, batch_size=2, img_width=299, img_height=299, verbose=1):
     """
     Infer with the inception v3.
     """
@@ -74,7 +74,6 @@ def infer(model, X_test, y_test, batch_size=1, img_width=299, img_height=299, ve
         X_test,
         y_test,
         batch_size=batch_size,
-        class_mode='categorical',
         shuffle=False)
 
     y_pred = model.predict_generator(
