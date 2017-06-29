@@ -108,7 +108,7 @@ def predict_for_each_task(df_labels_test, df_labels_train, target_size=(299,299)
     """
 
     ### define dictionary
-    pred_dict = {"id": [], "expected": []}
+    pred_dict = {"id": [], "predicted": []}
 
     ### get all task ids
     different_tasks = set(df_labels_train.taskId)
@@ -153,7 +153,7 @@ def predict_for_each_task(df_labels_test, df_labels_train, target_size=(299,299)
             if verbose >= 1: print("\tDefaulting to label %d (task %d)..."%(most_common_label,tid))
             for iid in df_labels_test['imageId']:
                 pred_dict["id"].append("%d_%d"%(iid,tid))
-                pred_dict["expected"].append(most_common_label)
+                pred_dict["predicted"].append(most_common_label)
         else:
             ##### Get predction from trained inception v3 net
             ### Load LabelEncoder
@@ -165,13 +165,13 @@ def predict_for_each_task(df_labels_test, df_labels_train, target_size=(299,299)
 
             for iid in id_error:
                 pred_dict["id"].append("%d_%d"%(iid,tid))
-                pred_dict["expected"].append(most_common_label)
+                pred_dict["predicted"].append(most_common_label)
 
             ### Create model
             if verbose >= 1: print("\tLoading Inception V3 (task %d)..."%tid)
             model = load_model(chosen_metrics=None,
                                inception_json=model_dir+"inceptionv3_mod_%d.json"%tid,
-                               inception_h5=model_dir+"inceptionv3_fine_tuned_check_point_3_%d.h5"%tid,
+                               inception_h5=model_dir+"inceptionv3_fine_tuned_check_point_2_%d.h5"%tid,
                                verbose=verbose)
 
             ### Inference with model
@@ -182,12 +182,13 @@ def predict_for_each_task(df_labels_test, df_labels_train, target_size=(299,299)
             y_pred = le.inverse_transform(y_pred)
             for iid, yp in zip(id_test, y_pred):
                 pred_dict["id"].append("%d_%d"%(iid,tid))
-                pred_dict["expected"].append(yp)
+                pred_dict["predicted"].append(yp)
 
             K.clear_session()
 
     pred_df = pd.DataFrame(pred_dict)
     print(pred_df.head())
+    pred_df = pred_df[["id", "predicted"]]
     pred_df.to_csv(pred_csv_name, index=False, header=True)
 
 
